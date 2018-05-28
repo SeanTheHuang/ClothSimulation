@@ -11,6 +11,7 @@ Entity::Entity(CModel* _model, Camera* _camera)
 	m_pModel = _model;
 	m_pCamera = _camera;
 	m_bStencil = false;
+
 }
 
 void Entity::Initialize(glm::vec3 _pos, glm::vec3 _scale, glm::vec3 _rotationAxis, float _rotationDegrees, glm::vec3 _colour)
