@@ -12,10 +12,10 @@ void MainLevel::Initialize()
 
 	// Create a floor
 	Cube* floor = new Cube(m_pCamera);
-	floor->Initialize(glm::vec3(0, -3, 10), glm::vec3(5, 1, 5), glm::vec3(0, 1, 0), 0, glm::vec4(0.7f, 0.7f, 0.7f, 1));
+	floor->Initialize(glm::vec3(0, -5, 10), glm::vec3(20, 1, 20), glm::vec3(0, 1, 0), 0, glm::vec4(0.7f, 0.7f, 0.7f, 1));
 	this->AddCube(floor);
 
-	this->SetCloth(new Cloth(m_pCamera, glm::vec3(-2.5f, 3, 10)));
+	this->SetCloth(new Cloth(m_pCamera, glm::vec3(-2.5f, 4, 10)));
 	
 }
 

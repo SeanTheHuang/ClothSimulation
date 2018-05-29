@@ -15,16 +15,16 @@ Cloth::~Cloth()
 
 void Cloth::Initialize()
 {
-	float xOffset = CLOTH_WIDTH / ((float)CLOTH_SIZE-1);
-	float yOffset = CLOTH_HEIGHT / ((float)CLOTH_SIZE-1);
+	float xOffset = CLOTH_SIZE / ((float)CLOTH_LOD-1);
+	float yOffset = CLOTH_SIZE / ((float)CLOTH_LOD-1);
 
-	float uvOffset = 1.0f / ((float)CLOTH_SIZE-1);
+	float uvOffset = 1.0f / ((float)CLOTH_LOD-1);
 
 	// Start creating cloth nodes
 	// Position of cloth = TOP LEFT
-	for (int y = 0; y < CLOTH_SIZE; y++)
+	for (int y = 0; y < CLOTH_LOD; y++)
 	{
-		for (int x = 0; x < CLOTH_SIZE; x++)
+		for (int x = 0; x < CLOTH_LOD; x++)
 		{
 			m_clothNodes[x][y].Initialize(glm::vec3(xOffset * x, yOffset * y * -1, 0) + m_position, glm::vec2(uvOffset * x, 1 - uvOffset * y), x, y);
 		}
@@ -32,10 +32,25 @@ void Cloth::Initialize()
 
 	// Make some nodes unmovable
 	m_clothNodes[0][0].m_canMove = false;
-	m_clothNodes[CLOTH_SIZE - 1][0].m_canMove = false;
+	m_clothNodes[CLOTH_LOD - 1][0].m_canMove = false;
+	m_clothNodes[CLOTH_LOD / 2][0].m_canMove = false;
 
 	// Set up draw data
 	SetUpRenderData();
+
+	// Set up joints
+	for (int y = 0; y < CLOTH_LOD; y++)
+	{
+		for (int x = 0; x < CLOTH_LOD; x++)
+		{
+			// For each node, try create a link between node [UNDER] & [TO THE LEFT] of them
+			if (x + 1 < CLOTH_LOD)
+				m_jointList.push_back(ClothJoint(&m_clothNodes[x][y], &m_clothNodes[x + 1][y]));
+
+			if (y + 1 < CLOTH_LOD)
+				m_jointList.push_back(ClothJoint(&m_clothNodes[x][y], &m_clothNodes[x][y + 1]));
+		}
+	}
 
 	// Set up opengl stuffs here
 	ShaderHelper::CompileAndLinkShaders("cloth_vs.glsl", "cloth_fs.glsl", m_program);
@@ -84,26 +99,31 @@ void Cloth::Render()
 
 void Cloth::Update()
 {
-	for (int y = 0; y < CLOTH_SIZE; y++)
+	// Update position based on restrictions
+	for (size_t i = 0; i < m_jointList.size(); i++)
 	{
-		for (int x = 0; x < CLOTH_SIZE; x++)
+		m_jointList[i].Update();
+	}
+
+	for (int y = 0; y < CLOTH_LOD; y++)
+	{
+		for (int x = 0; x < CLOTH_LOD; x++)
 		{
 			// Apply acceleration objects
-			m_clothNodes[x][y].m_acceleration = glm::vec3(0, -9.81f, 0);
+			// Gravity + some wind force
+			m_clothNodes[x][y].m_acceleration = glm::vec3(0, -10, 8.5f);
 			m_clothNodes[x][y].Update();
 		}
 	}
-
-	// Update position based on restrictions
 }
 
 void Cloth::SetUpRenderData()
 {
 	m_drawDataList.clear();
 
-	for (int y = 0; y < CLOTH_SIZE-1; y++)
+	for (int y = 0; y < CLOTH_LOD-1; y++)
 	{
-		for (int x = 0; x < CLOTH_SIZE-1; x++)
+		for (int x = 0; x < CLOTH_LOD-1; x++)
 		{
 			// Set up bunch of triangles in m_drawDataList
 			m_drawDataList.push_back(DrawData(m_clothNodes[x][y].m_position, m_clothNodes[x][y].m_uv));
