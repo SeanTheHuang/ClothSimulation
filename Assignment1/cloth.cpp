@@ -15,10 +15,10 @@ Cloth::~Cloth()
 
 void Cloth::Initialize()
 {
-	float xOffset = CLOTH_WIDTH / (float)CLOTH_SIZE;
-	float yOffset = CLOTH_HEIGHT / (float)CLOTH_SIZE;
+	float xOffset = CLOTH_WIDTH / ((float)CLOTH_SIZE-1);
+	float yOffset = CLOTH_HEIGHT / ((float)CLOTH_SIZE-1);
 
-	float uvOffset = 1.0f / (float)CLOTH_SIZE;
+	float uvOffset = 1.0f / ((float)CLOTH_SIZE-1);
 
 	// Start creating cloth nodes
 	// Position of cloth = TOP LEFT
@@ -26,7 +26,7 @@ void Cloth::Initialize()
 	{
 		for (int x = 0; x < CLOTH_SIZE; x++)
 		{
-			m_clothNodes[x][y].Initialize(glm::vec3(xOffset * x, yOffset * y, 0) + m_position, glm::vec2(uvOffset * x, 1 - uvOffset * y), x, y);
+			m_clothNodes[x][y].Initialize(glm::vec3(xOffset * x, yOffset * y * -1, 0) + m_position, glm::vec2(uvOffset * x, 1 - uvOffset * y), x, y);
 		}
 	}
 
@@ -75,6 +75,7 @@ void Cloth::Render()
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo); 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(DrawData) * m_drawDataList.size(), &m_drawDataList[0], GL_STATIC_DRAW);
 
+	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, m_drawDataList.size());
 
 	glEnable(GL_CULL_FACE);
@@ -83,11 +84,17 @@ void Cloth::Render()
 
 void Cloth::Update()
 {
-	// Apply acceleration objects
+	for (int y = 0; y < CLOTH_SIZE; y++)
+	{
+		for (int x = 0; x < CLOTH_SIZE; x++)
+		{
+			// Apply acceleration objects
+			m_clothNodes[x][y].m_acceleration = glm::vec3(0, -9.81f, 0);
+			m_clothNodes[x][y].Update();
+		}
+	}
 
-
-	// Update position of each node depending on force
-
+	// Update position based on restrictions
 }
 
 void Cloth::SetUpRenderData()

@@ -11,7 +11,7 @@ const float CLOTH_HEIGHT = 3;
 struct ClothNode
 {
 	glm::vec3 m_position;
-	glm::vec3 m_velocity;
+	glm::vec3 m_oldPosition;
 	glm::vec3 m_acceleration;
 	glm::vec2 m_uv;
 	bool m_canMove;
@@ -20,12 +20,26 @@ struct ClothNode
 	void Initialize(glm::vec3 _position, glm::vec2 _uv, int _X, int _Y)
 	{
 		m_position = _position;
+		m_oldPosition = _position;
 		m_uv = _uv;
-		m_velocity = glm::vec3(0);
 		m_acceleration = glm::vec3(0);
 		m_canMove = true;
 		m_X = _X;
 		m_Y = _Y;
+	}
+
+	void SetAcceleration(glm::vec3 _newAccel) { m_acceleration = _newAccel; }
+	void Update()
+	{
+		glm::vec3 tempPosition = m_position;
+
+		// Verlet Integration
+		float accelSquared = Time::Instance().DeltaTime() * Time::Instance().DeltaTime();
+		m_position = glm::vec3(m_position.x * 2, m_position.y * 2, m_position.z * 2)
+			- m_oldPosition
+			+ glm::vec3(m_acceleration.x * accelSquared, m_acceleration.y * accelSquared, m_acceleration.z * accelSquared);
+
+		m_oldPosition = tempPosition;
 	}
 };
 
