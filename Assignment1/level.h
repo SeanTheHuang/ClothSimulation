@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "quad.h"
 #include "cube.h"
+#include "cloth.h"
 
 class Level
 {
@@ -25,6 +26,7 @@ public:
 	void AddEntity(Entity* _newEntity);
 	void AddQuad(Quad* _newQuad);
 	void AddCube(Cube* _newCube);
+	void SetCloth(Cloth* _cloth);
 
 protected:
 	Level(const Level&) = delete;
@@ -36,4 +38,5 @@ protected:
 	std::vector<Entity*> m_vecEntity;
 	std::vector<Quad*> m_vecQuads;
 	std::vector<Cube*> m_vecCubes;
+	Cloth* m_pCloth;
 };

@@ -30,7 +30,8 @@ void Level::Update()
 		m_vecQuads[i]->Update();
 	}
 
-	
+	if (m_pCloth)
+		m_pCloth->Update();
 }
 
 void Level::Render()
@@ -52,6 +53,9 @@ void Level::Render()
 	{
 		m_vecQuads[i]->Render();
 	}
+
+	if (m_pCloth)
+		m_pCloth->Render();
 }
 
 void Level::CleanUp()
@@ -80,6 +84,10 @@ void Level::CleanUp()
 	}
 	m_vecCubes.clear();
 
+	if (m_pCloth)
+		delete m_pCloth;
+	m_pCloth = nullptr;
+
 }
 
 void Level::AddEntity(Entity* _newEntity)
@@ -95,4 +103,9 @@ void Level::AddQuad(Quad* _newQuad)
 void Level::AddCube(Cube * _newCube)
 {
 	m_vecCubes.push_back(_newCube);
+}
+
+void Level::SetCloth(Cloth * _cloth)
+{
+	m_pCloth = _cloth;
 }

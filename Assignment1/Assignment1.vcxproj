@@ -179,6 +179,8 @@
     <ClInclude Include="time.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cloth_fs.glsl" />
+    <None Include="cloth_vs.glsl" />
     <None Include="cube_fs.glsl" />
     <None Include="cube_vs.glsl" />
     <None Include="model_fs.glsl" />

@@ -154,5 +154,11 @@
     <None Include="cube_vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="cloth_fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="cloth_vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
