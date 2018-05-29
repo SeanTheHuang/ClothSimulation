@@ -29,4 +29,9 @@ void MainLevel::Update()
 		CleanUp();
 		Initialize();
 	}
+
+	if (Input::Instance().GetKeyDown('q'))
+	{
+		m_pCloth->DropCloth();
+	}
 }

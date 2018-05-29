@@ -62,8 +62,8 @@ struct ClothNode
 		m_acceleration = glm::vec3(0);
 
 		// Random floor "Collision detection"
-		if (m_position.y < -4)
-			m_position.y = -4;
+		if (m_position.y < -2)
+			m_position.y = -2;
 	}
 };
 
@@ -128,6 +128,7 @@ public:
 	void Initialize();
 	void Render();
 	void Update();
+	void DropCloth();
 
 private:
 	void SetUpRenderData();

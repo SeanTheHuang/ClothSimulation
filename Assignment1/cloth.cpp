@@ -119,6 +119,14 @@ void Cloth::Update()
 	}
 }
 
+void Cloth::DropCloth()
+{
+	// Make some nodes unmovable
+	m_clothNodes[0][0].m_canMove = true;
+	m_clothNodes[CLOTH_LOD - 1][0].m_canMove = true;
+	m_clothNodes[CLOTH_LOD / 2][0].m_canMove = true;
+}
+
 void Cloth::SetUpRenderData()
 {
 	m_drawDataList.clear();
