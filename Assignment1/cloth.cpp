@@ -105,13 +105,15 @@ void Cloth::Update()
 		m_jointList[i].Update();
 	}
 
+	// Wind force
+	ApplyWind();
+
 	for (int y = 0; y < CLOTH_LOD; y++)
 	{
 		for (int x = 0; x < CLOTH_LOD; x++)
 		{
-			// Apply acceleration objects
-			// Gravity + some wind force
-			m_clothNodes[x][y].m_acceleration = glm::vec3(0, -10, 8.5f);
+			// Gravity
+			m_clothNodes[x][y].AddAcceleration(glm::vec3(0, -10, 0));
 			m_clothNodes[x][y].Update();
 		}
 	}
@@ -135,4 +137,36 @@ void Cloth::SetUpRenderData()
 			m_drawDataList.push_back(DrawData(m_clothNodes[x + 1][y + 1].m_position, m_clothNodes[x][y].m_uv));
 		}
 	}
+}
+
+void Cloth::ApplyWind()
+{
+	const float WIND_FORCE = 15;
+	const glm::vec3 WIND_DIRECTION = glm::vec3(0.7071f, 0, 0.7071f);
+
+	// Apply wind in triangles
+	for (int y = 0; y < CLOTH_LOD - 1; y++)
+	{
+		for (int x = 0; x < CLOTH_LOD - 1; x++)
+		{
+			glm::vec3 normal = GetNormalFromPoints(m_clothNodes[x][y], m_clothNodes[x + 1][y], m_clothNodes[x][y + 1]);
+			float intensity = glm::dot(normal, WIND_DIRECTION);
+			m_clothNodes[x][y].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+			m_clothNodes[x+1][y].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+			m_clothNodes[x][y+1].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+
+			normal = GetNormalFromPoints(m_clothNodes[x][y+1], m_clothNodes[x + 1][y], m_clothNodes[x + 1][y + 1]);
+			intensity = glm::dot(normal, WIND_DIRECTION);
+			m_clothNodes[x][y + 1].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+			m_clothNodes[x + 1][y].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+			m_clothNodes[x + 1][y + 1].AddAcceleration(glm::vec3(0, 0, intensity * WIND_FORCE));
+		}
+	}
+}
+
+glm::vec3 Cloth::GetNormalFromPoints(ClothNode _n1, ClothNode _n2, ClothNode _n3)
+{
+	glm::vec3 temp1 = glm::normalize(_n1.m_position - _n2.m_position);
+	glm::vec3 temp2 = glm::normalize(_n1.m_position - _n3.m_position);
+	return glm::cross(temp1, temp2);
 }

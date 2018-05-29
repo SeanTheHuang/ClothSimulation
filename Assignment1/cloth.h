@@ -39,7 +39,7 @@ struct ClothNode
 		m_position += _newPos; 
 	}
 
-	void SetAcceleration(glm::vec3 _newAccel) { m_acceleration = _newAccel; }
+	void AddAcceleration(glm::vec3 _newAccel) { m_acceleration += _newAccel; }
 	void Update()
 	{
 		// Cannot move, don't do movement calcuations
@@ -131,6 +131,8 @@ public:
 
 private:
 	void SetUpRenderData();
+	void ApplyWind();
+	glm::vec3 GetNormalFromPoints(ClothNode _n1, ClothNode _n2, ClothNode _n3);
 
 	std::vector<ClothJoint> m_jointList;
 	std::vector<DrawData> m_drawDataList;
