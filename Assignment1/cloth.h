@@ -132,6 +132,7 @@ public:
 
 private:
 	void SetUpRenderData();
+	void RotateWindDirection();
 	void ApplyWind();
 	glm::vec3 GetNormalFromPoints(ClothNode _n1, ClothNode _n2, ClothNode _n3);
 
@@ -140,6 +141,8 @@ private:
 	ClothNode m_clothNodes[CLOTH_LOD][CLOTH_LOD];
 	glm::vec3 m_position;
 	Camera* m_pCamera;
-
 	GLuint m_program, m_vbo, m_vao;
+
+	float m_windForce;
+	glm::vec3 m_windDirection;
 };
