@@ -2,6 +2,7 @@
 
 #include "include.h"
 #include "camera.h"
+#include "texture.h"
 #include <vector>
 
 // Cloth size, and how many particles in the cloth (CLOTH_LOD * CLOTH_LOD)
@@ -123,7 +124,7 @@ struct ClothJoint
 class Cloth
 {
 public:
-	Cloth(Camera* _camera, glm::vec3 _position);
+	Cloth(Camera* _camera, glm::vec3 _position, std::string _textPath);
 	~Cloth();
 	void Initialize();
 	void Render();
@@ -141,7 +142,9 @@ private:
 	ClothNode m_clothNodes[CLOTH_LOD][CLOTH_LOD];
 	glm::vec3 m_position;
 	Camera* m_pCamera;
-	GLuint m_program, m_vbo, m_vao;
+	std::string m_textPath;
+	Texture* m_pTexture;
+	GLuint m_program, m_vbo, m_vao, m_sampler;
 
 	float m_windForce;
 	glm::vec3 m_windDirection;

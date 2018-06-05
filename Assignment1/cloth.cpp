@@ -2,22 +2,25 @@
 #include "shaderhelper.h"
 #include <math.h>
 
-Cloth::Cloth(Camera * _camera, glm::vec3 _position)
+Cloth::Cloth(Camera * _camera, glm::vec3 _position, std::string _textPath)
 {
 	m_pCamera = _camera;
 	m_position = _position;
+	m_textPath = _textPath;
 
 	Initialize();
 }
 
 Cloth::~Cloth()
 {
+	if (m_pTexture)
+		delete m_pTexture;
 }
 
 void Cloth::Initialize()
 {
 	m_windForce = 15;
-	m_windDirection = glm::vec3(0, 0, 1);
+	m_windDirection = glm::normalize(glm::vec3(-5, 0, -5));
 
 	float xOffset = CLOTH_SIZE / ((float)CLOTH_LOD-1);
 	float yOffset = CLOTH_SIZE / ((float)CLOTH_LOD-1);
@@ -30,7 +33,7 @@ void Cloth::Initialize()
 	{
 		for (int x = 0; x < CLOTH_LOD; x++)
 		{
-			m_clothNodes[x][y].Initialize(glm::vec3(xOffset * x, yOffset * y * -1, 0) + m_position, glm::vec2(uvOffset * x, 1 - uvOffset * y), x, y);
+			m_clothNodes[x][y].Initialize(glm::vec3(xOffset * x, yOffset * y * -1, 0) + m_position, glm::vec2(uvOffset * x, uvOffset * y), x, y);
 		}
 	}
 
@@ -76,6 +79,13 @@ void Cloth::Initialize()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	// Create texture
+	m_pTexture = new Texture(GL_TEXTURE_2D, m_textPath);
+	if (!m_pTexture->load())
+	{
+		std::cout << "Error Loading Texture from filepath: " << m_textPath;
+	}
 }
 
 void Cloth::Render()
@@ -93,6 +103,9 @@ void Cloth::Render()
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo); 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(DrawData) * m_drawDataList.size(), &m_drawDataList[0], GL_STATIC_DRAW);
+
+	m_pTexture->bind(GL_TEXTURE0);
+	glUniform1i(m_sampler, 0);
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, m_drawDataList.size());
@@ -193,7 +206,7 @@ void Cloth::ApplyWind()
 
 glm::vec3 Cloth::GetNormalFromPoints(ClothNode _n1, ClothNode _n2, ClothNode _n3)
 {
-	glm::vec3 temp1 = glm::normalize(_n1.m_position - _n2.m_position);
-	glm::vec3 temp2 = glm::normalize(_n1.m_position - _n3.m_position);
+	glm::vec3 temp1 = glm::normalize(_n2.m_position - _n1.m_position);
+	glm::vec3 temp2 = glm::normalize(_n3.m_position - _n1.m_position);
 	return glm::cross(temp1, temp2);
 }
